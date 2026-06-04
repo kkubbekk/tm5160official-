@@ -1,0 +1,4 @@
+../Core/Src/TMC_port.c:6:16:tmc5160_getBusType	16	static
+../Core/Src/TMC_port.c:10:6:tmc5160_readWriteSPI	32	static
+../Core/Src/TMC_port.c:19:6:tmc5160_readWriteUART	24	static
+../Core/Src/TMC_port.c:23:9:tmc5160_getNodeAddress	16	static
