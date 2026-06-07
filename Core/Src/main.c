@@ -127,6 +127,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
+//  static SemaphoreHandle_t dma_semaphore;
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -351,6 +352,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, TMC_CS_Pin|MOTOR_EN_Pin, GPIO_PIN_SET);
@@ -363,6 +365,9 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DIR_GPIO_Port, DIR_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(SD_MODE_GPIO_Port, SD_MODE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : ENC_I_Pin ENC_A_Pin ENC_B_Pin */
   GPIO_InitStruct.Pin = ENC_I_Pin|ENC_A_Pin|ENC_B_Pin;
@@ -391,6 +396,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(DIR_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : SD_MODE_Pin */
+  GPIO_InitStruct.Pin = SD_MODE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(SD_MODE_GPIO_Port, &GPIO_InitStruct);
+
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
@@ -417,6 +429,7 @@ void StartDefaultTask(void *argument)
 
 	// 2. WSTĘPNE BLOKADY SPRZĘTOWE
 	// Wyłączamy wszystko na starcie, żeby układ nie "zgłupiał" przy skokach napięcia
+	HAL_GPIO_WritePin(SD_MODE_GPIO_Port, SD_MODE_Pin, GPIO_PIN_RESET); //sdome
 	HAL_GPIO_WritePin(GPIOB, PWR_CONVERTER_EN_Pin, GPIO_PIN_RESET); // Przetwornica OFF
 	HAL_GPIO_WritePin(GPIOA, MOTOR_EN_Pin, GPIO_PIN_SET);           // Silnik OFF (Stan wysoki = odcięcie)
 	HAL_GPIO_WritePin(GPIOA, TMC_CS_Pin, GPIO_PIN_SET);             // SPI CS w górę (stan spoczynkowy)
@@ -448,14 +461,23 @@ void StartDefaultTask(void *argument)
 	printf("[LOGIC] Konfiguracja sterownika po SPI\r\n");
 	tmc5160_initCache();
 
-	// Odblokowanie Choppera (wymagane by silnik drgnął)
-	tmc5160_fieldWrite(0, TMC5160_TOFF_FIELD, 3);
+	// Konfiguracja rejestru CHOPCONF (Musimy podać kompletne, bezpieczne wartości!)
+	tmc5160_fieldWrite(0, TMC5160_TOFF_FIELD, 3);     // Czas wyłączenia kluczy (odblokowanie chopperów)
+	tmc5160_fieldWrite(0, TMC5160_TBL_FIELD, 2);      // TBL = 2 (Czas ślepy ~24 cykle zegara) -> TO RATUJE PRZED BŁĘDEM ZWARCIA!
+	tmc5160_fieldWrite(0, TMC5160_HEND_FIELD, 0);     // Hysteresis end
+	tmc5160_fieldWrite(0, TMC5160_HSTRT_FIELD, 5);    // Hysteresis start
 
 	// Ustawienie prądów
-	tmc5160_fieldWrite(0, TMC5160_IRUN_FIELD, 15);
-	tmc5160_fieldWrite(0, TMC5160_IHOLD_FIELD, 5);
+	tmc5160_fieldWrite(0, TMC5160_IRUN_FIELD, 15);    // Prąd w ruchu
+	tmc5160_fieldWrite(0, TMC5160_IHOLD_FIELD, 5);    // Prąd trzymania
+	tmc5160_fieldWrite(0, TMC5160_IHOLDDELAY_FIELD, 10); // Opóźnienie przejścia w IHOLD
+
+	// KONFIGURACJA RAMPY (Bez tego wewnętrzny generator stoi w miejscu!)
+	tmc5160_fieldWrite(0, TMC5160_AMAX_FIELD, 5000);  // Ustawiamy przyspieszenie
+	tmc5160_fieldWrite(0, TMC5160_DMAX_FIELD, 5000);  // Ustawiamy opóźnienie hamowania
 
 	// Testowy obrót
+	printf("[LOGIC] Start krecenia silnikiem...\r\n");
 	tmc5160_rotateMotor(0, 0, 50000);
   /* Infinite loop */
   for(;;)

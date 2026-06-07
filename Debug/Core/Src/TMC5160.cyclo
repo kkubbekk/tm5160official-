@@ -7,8 +7,8 @@
 ../Core/Src/TMC5160.c:158:9:tmc5160_readRegister	4
 ../Core/Src/TMC5160.c:181:6:tmc5160_writeRegister	3
 ../Core/Src/TMC5160.c:196:9:readRegisterSPI	1
-../Core/Src/TMC5160.c:217:6:writeRegisterSPI	1
-../Core/Src/TMC5160.c:234:9:readRegisterUART	6
-../Core/Src/TMC5160.c:266:6:writeRegisterUART	1
-../Core/Src/TMC5160.c:285:6:tmc5160_rotateMotor	3
-../Core/Src/TMC5160.c:294:16:CRC8	2
+../Core/Src/TMC5160.c:219:6:writeRegisterSPI	1
+../Core/Src/TMC5160.c:236:9:readRegisterUART	6
+../Core/Src/TMC5160.c:268:6:writeRegisterUART	1
+../Core/Src/TMC5160.c:287:6:tmc5160_rotateMotor	3
+../Core/Src/TMC5160.c:296:16:CRC8	2

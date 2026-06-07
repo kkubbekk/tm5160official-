@@ -1,4 +1,4 @@
 ../Core/Src/TMC_port.c:6:16:tmc5160_getBusType	1
 ../Core/Src/TMC_port.c:10:6:tmc5160_readWriteSPI	1
-../Core/Src/TMC_port.c:19:6:tmc5160_readWriteUART	1
-../Core/Src/TMC_port.c:23:9:tmc5160_getNodeAddress	1
+../Core/Src/TMC_port.c:20:6:tmc5160_readWriteUART	1
+../Core/Src/TMC_port.c:24:9:tmc5160_getNodeAddress	1

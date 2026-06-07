@@ -11,7 +11,7 @@ void tmc5160_readWriteSPI(uint16_t icID, uint8_t *data, size_t dataLength) {
 
     HAL_GPIO_WritePin(TMC_CS_GPIO_Port, TMC_CS_Pin, GPIO_PIN_RESET);
 
-    HAL_SPI_TransmitReceive(&hspi1, data, data, dataLength, 100);
+    HAL_SPI_TransmitReceive(&hspi1, data, data, dataLength, HAL_MAX_DELAY);
 
     HAL_GPIO_WritePin(TMC_CS_GPIO_Port, TMC_CS_Pin, GPIO_PIN_SET);
 }

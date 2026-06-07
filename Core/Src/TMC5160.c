@@ -5,7 +5,7 @@
 * Copyright © 2024 Analog Devices, Inc.
 *******************************************************************************/
 
-
+#include "cmsis_os.h"
 #include "TMC5160.h"
 
 #ifdef TMC_API_EXTERNAL_CRC_TABLE
@@ -203,7 +203,9 @@ int32_t readRegisterSPI(uint16_t icID, uint8_t address)
     data[0] = address;
 
     // Send the read request
-    tmc5160_readWriteSPI(icID, &data[0], sizeof(data));
+        tmc5160_readWriteSPI(icID, &data[0], sizeof(data));
+
+        osDelay(1);
 
     // Rewrite address and clear write bit
     data[0] = address;
