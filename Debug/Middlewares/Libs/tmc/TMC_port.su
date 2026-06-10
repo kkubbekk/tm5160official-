@@ -1,0 +1,5 @@
+../Middlewares/Libs/tmc/TMC_port.c:10:6:TMC_SPI_Transfer	24	static
+../Middlewares/Libs/tmc/TMC_port.c:21:6:HAL_SPI_TxRxCpltCallback	16	static
+../Middlewares/Libs/tmc/TMC_port.c:27:6:HAL_SPI_ErrorCallback	16	static
+../Middlewares/Libs/tmc/TMC_port.c:33:16:tmc5160_getBusType	16	static
+../Middlewares/Libs/tmc/TMC_port.c:38:9:tmc5160_getNodeAddress	16	static

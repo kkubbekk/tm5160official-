@@ -7,6 +7,12 @@
 
 #include "cmsis_os.h"
 #include "TMC5160.h"
+#include "TMC_port.h"
+//#include "TMC_port.h"
+
+extern uint8_t dma_buffer_tx[5];
+extern uint8_t dma_buffer_rx[5];
+extern void dma_spi_transfer(uint8_t *tx, uint8_t *rx, size_t len);
 
 #ifdef TMC_API_EXTERNAL_CRC_TABLE
 extern const uint8_t tmcCRCTable_Poly7Reflected[256];
@@ -151,8 +157,7 @@ extern bool tmc5160_cache(uint16_t icID, TMC5160CacheOp operation, uint8_t addre
 /************************************************************** Register read / write Implementation ******************************************************************/
 static int32_t readRegisterSPI(uint16_t icID, uint8_t address);
 static void writeRegisterSPI(uint16_t icID, uint8_t address, int32_t value);
-static int32_t readRegisterUART(uint16_t icID, uint8_t registerAddress);
-static void writeRegisterUART(uint16_t icID, uint8_t registerAddress, int32_t value);
+
 static uint8_t CRC8(uint8_t *data, uint32_t bytes);
 
 int32_t tmc5160_readRegister(uint16_t icID, uint8_t address)
@@ -169,11 +174,6 @@ int32_t tmc5160_readRegister(uint16_t icID, uint8_t address)
     {
         return readRegisterSPI(icID, address);
     }
-    else if (bus == IC_BUS_UART)
-    {
-        return readRegisterUART(icID, address);
-    }
-
     //ToDo: Error handling
     return -1;
 }
@@ -186,102 +186,37 @@ void tmc5160_writeRegister(uint16_t icID, uint8_t address, int32_t value)
     {
         writeRegisterSPI(icID, address, value);
     }
-    else if(bus == IC_BUS_UART)
-    {
-        writeRegisterUART(icID, address, value);
-
-    }
 }
 
-int32_t readRegisterSPI(uint16_t icID, uint8_t address)
+static void writeRegisterSPI(uint16_t icID, uint8_t address, int32_t value)
 {
-    uint8_t data[5] = { 0 };
+    uint8_t tx[5];
+    uint8_t rx[5];
 
-    address = address & TMC5160_ADDRESS_MASK;
+    tx[0] = address | TMC5160_WRITE_BIT;
+    tx[1] = (value >> 24) & 0xFF;
+    tx[2] = (value >> 16) & 0xFF;
+    tx[3] = (value >> 8) & 0xFF;
+    tx[4] = value & 0xFF;
 
-    // clear write bit
-    data[0] = address;
+    TMC_SPI_Transfer(tx, rx, 5);
 
-    // Send the read request
-        tmc5160_readWriteSPI(icID, &data[0], sizeof(data));
-
-        osDelay(1);
-
-    // Rewrite address and clear write bit
-    data[0] = address;
-
-    // Send another request to receive the read reply
-    tmc5160_readWriteSPI(icID, &data[0], sizeof(data));
-
-    return ((uint32_t)data[1] << 24) | ((uint32_t) data[2] << 16) | ( data[3] <<  8) | ( data[4]);
-}
-
-void writeRegisterSPI(uint16_t icID, uint8_t address, int32_t value)
-{
-    uint8_t data[5] = { 0 };
-
-    data[0] = address | TMC5160_WRITE_BIT;
-    data[1] = 0xFF & (value>>24);
-    data[2] = 0xFF & (value>>16);
-    data[3] = 0xFF & (value>>8);
-    data[4] = 0xFF & (value>>0);
-
-    // Send the write request
-    tmc5160_readWriteSPI(icID, &data[0], sizeof(data));
-
-    //Cache the registers with write-only access
     tmc5160_cache(icID, TMC5160_CACHE_WRITE, address, (uint32_t *)&value);
 }
 
-int32_t readRegisterUART(uint16_t icID, uint8_t address)
+static int32_t readRegisterSPI(uint16_t icID, uint8_t address)
 {
-    uint8_t data[8] = { 0 };
+    uint8_t tx[5] = {0};
+    uint8_t rx[5] = {0};
 
-    address = address & TMC5160_ADDRESS_MASK;
-    data[0] = 0x05;
-    data[1] = tmc5160_getNodeAddress(icID); //targetAddressUart;
-    data[2] = address;
-    data[3] = CRC8(data, 3);
+    tx[0] = address & TMC5160_ADDRESS_MASK;
 
-    if (!tmc5160_readWriteUART(icID, &data[0], 4, 8))
-        return 0;
+    TMC_SPI_Transfer(tx, rx, 5);
+    osDelay(1);
 
-    // Byte 0: Sync nibble correct?
-    if (data[0] != 0x05)
-        return 0;
+    TMC_SPI_Transfer(tx, rx, 5);
 
-    // Byte 1: Master address correct?
-    if (data[1] != 0xFF)
-        return 0;
-
-    // Byte 2: Address correct?
-    if (data[2] != address)
-        return 0;
-
-    // Byte 7: CRC correct?
-    if (data[7] != CRC8(data, 7))
-        return 0;
-
-    return ((uint32_t)data[3] << 24) | ((uint32_t)data[4] << 16) | (data[5] << 8) | data[6];
-}
-
-void writeRegisterUART(uint16_t icID, uint8_t address, int32_t value)
-{
-    uint8_t data[8];
-
-    data[0] = 0x05;
-    data[1] = tmc5160_getNodeAddress(icID); //targetAddressUart;
-    data[2] = address | TMC5160_WRITE_BIT;
-    data[3] = (value >> 24) & 0xFF;
-    data[4] = (value >> 16) & 0xFF;
-    data[5] = (value >> 8 ) & 0xFF;
-    data[6] = (value      ) & 0xFF;
-    data[7] = CRC8(data, 7);
-
-    tmc5160_readWriteUART(icID, &data[0], 8, 0);
-
-    //Cache the registers with write-only access
-    tmc5160_cache(icID, TMC5160_CACHE_WRITE, address, (uint32_t *)&value);
+    return ((uint32_t)rx[1] << 24) | ((uint32_t)rx[2] << 16) | (rx[3] << 8) | rx[4];
 }
 
 void tmc5160_rotateMotor(uint16_t icID, uint8_t motor, int32_t velocity)

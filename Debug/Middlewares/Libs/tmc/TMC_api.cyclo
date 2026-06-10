@@ -1,0 +1,7 @@
+../Middlewares/Libs/tmc/TMC_api.c:17:6:stepper_init	15
+../Middlewares/Libs/tmc/TMC_api.c:102:6:stepper_SetTargetPosition	1
+../Middlewares/Libs/tmc/TMC_api.c:106:9:Stepper_GetActualPosition	1
+../Middlewares/Libs/tmc/TMC_api.c:110:6:Stepper_isPositionReached	1
+../Middlewares/Libs/tmc/TMC_api.c:114:6:Stepper_stop	1
+../Middlewares/Libs/tmc/TMC_api.c:119:6:Stepper_SetCurrents	1
+../Middlewares/Libs/tmc/TMC_api.c:127:6:stepper_Home	1

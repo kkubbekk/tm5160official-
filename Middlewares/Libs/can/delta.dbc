@@ -1,0 +1,337 @@
+VERSION "1"
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    CLK_BIN_
+    PROPERTY_STATE_
+    BO_TX_BU_
+    SG_MUL_VAL_
+    DUMMY_NODE_VECTOR_0
+
+BS_:
+
+BU_: USER_INPUT_BOARD MOTOR_BOARD ESC HEIGHT_SENSOR BMS LEFT_SERVO RIGHT_SERVO BACK_SERVO INS RPI_TB MPPT_1 MPPT_2 MPPT_3 MPPT_4 MPPT_5 MPPT_6
+
+BO_ 0 DIRECT_MOTOR_CONTROL: 8 USER_INPUT_BOARD
+    SG_ Input_request : 0|32@1- (1,0) [-1024|1023] "" DUMMY_NODE_VECTOR_0
+    SG_ Propeller_parking_request : 32|1@1+ (1,0) [0|1] "" DUMMY_NODE_VECTOR_0
+    SG_ RESERVED_BYTE_4 : 33|7@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+    SG_ RESERVED_BYTES_5_TO_7 : 40|24@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+
+BO_ 1 ESC_TELEMETRY_1: 8 ESC
+    SG_ battery_voltage : 0|16@1+ (0.1,0) [0|6553.5] "V" DUMMY_NODE_VECTOR_0
+    SG_ battery_current_avg : 16|16@1- (0.1,0) [-3276.8|3276.7] "A" DUMMY_NODE_VECTOR_0
+    SG_ rpm : 32|32@1- (1,0) [-2147483648|2147483647] "rpm" DUMMY_NODE_VECTOR_0
+
+BO_ 2 ESC_TELEMETRY_2: 8 ESC
+    SG_ motor_temperature : 0|16@1- (1,0) [-32768|32767] "C" DUMMY_NODE_VECTOR_0
+    SG_ esc_temperature_main : 16|16@1- (1,0) [-32768|32767] "C" DUMMY_NODE_VECTOR_0
+    SG_ esc_temperature_cap : 32|16@1- (1,0) [-32768|32767] "C" DUMMY_NODE_VECTOR_0
+    SG_ ext_sensor_temperature : 48|16@1- (1,0) [-32768|32767] "C" DUMMY_NODE_VECTOR_0
+
+BO_ 3 ESC_TELEMETRY_3: 8 ESC
+    SG_ output_pwm : 0|16@1- (0.000977517,0) [-32.02|32.02] "" DUMMY_NODE_VECTOR_0
+    SG_ input_pwm : 16|16@1- (0.000977517,0) [-32.02|32.02] "" DUMMY_NODE_VECTOR_0
+
+BO_ 4 ESC_TELEMETRY_4: 8 ESC
+    SG_ error_bitmask : 0|32@1+ (1,0) [0|4294967295] "" DUMMY_NODE_VECTOR_0
+    SG_ warning_bitmask : 32|32@1+ (1,0) [0|4294967295] "" DUMMY_NODE_VECTOR_0
+
+BO_ 5 ESC_TELEMETRY_5: 8 ESC
+    SG_ notice_bitmask : 0|32@1+ (1,0) [0|4294967295] "" DUMMY_NODE_VECTOR_0
+    SG_ esc_init_status : 48|16@1+ (1,0) [0|65535] "" DUMMY_NODE_VECTOR_0
+
+BO_ 6 ESC_TELEMETRY_6: 8 ESC
+    SG_ battery_internal_voltage : 0|16@1+ (0.1,0) [0|6553.5] "V" DUMMY_NODE_VECTOR_0
+    SG_ external_feeding_voltage : 16|16@1+ (0.001,0) [0|65.535] "V" DUMMY_NODE_VECTOR_0
+    SG_ phase_current_max : 32|16@1+ (1,0) [0|65535] "A" DUMMY_NODE_VECTOR_0
+    SG_ phase_current_avg : 48|16@1+ (1,0) [0|65535] "A" DUMMY_NODE_VECTOR_0
+
+BO_ 7 ESC_TELEMETRY_7: 8 ESC
+    SG_ battery_current_max : 0|16@1+ (1,0) [0|65535] "A" DUMMY_NODE_VECTOR_0
+    SG_ internal_bus_voltage : 48|8@1+ (0.1,0) [0|25.5] "V" DUMMY_NODE_VECTOR_0
+
+BO_ 129 STEERING_MAIN: 8 USER_INPUT_BOARD
+    SG_ throttle : 0|16@1- (1,0) [-1000|1000] "permile" DUMMY_NODE_VECTOR_0
+    SG_ joy_x : 16|16@1- (1,0) [-1000|1000] "permile" DUMMY_NODE_VECTOR_0
+    SG_ joy_y : 32|16@1- (1,0) [-1000|1000] "permile" DUMMY_NODE_VECTOR_0
+    SG_ enc_back_foil : 48|16@1- (1,0) [-1000|1000] "permile" DUMMY_NODE_VECTOR_0
+
+BO_ 130 STEERING_PUMPS: 2 USER_INPUT_BOARD
+    SG_ bilge_pump_cmd : 0|2@1+ (1,0) [0|3] "" DUMMY_NODE_VECTOR_0
+    SG_ cooling_pump_cmd : 2|2@1+ (1,0) [0|3] "" DUMMY_NODE_VECTOR_0
+    SG_ flight_control_cmd : 4|2@1+ (1,0) [0|3] "" DUMMY_NODE_VECTOR_0
+
+BO_ 767 HEIGHT_DATA: 4 HEIGHT_SENSOR
+    SG_ height_raw : 0|16@1+ (0.001,0) [0|1.5] "m" DUMMY_NODE_VECTOR_0
+    SG_ height_adjusted : 16|16@1+ (0.001,0) [0.01|1.5] "m" DUMMY_NODE_VECTOR_0
+
+BO_ 1153 BMS_POWER_CRITICAL: 8 BMS
+    SG_ battery_current : 0|16@1- (0.1,0) [-300|300] "A" DUMMY_NODE_VECTOR_0
+    SG_ battery_voltage : 16|16@1+ (0.002,0) [0|70] "V" DUMMY_NODE_VECTOR_0
+    SG_ cell_min_voltage : 32|16@1+ (0.001,0) [0|5] "V" DUMMY_NODE_VECTOR_0
+    SG_ cell_max_voltage : 48|16@1+ (0.001,0) [0|5] "V" DUMMY_NODE_VECTOR_0
+
+BO_ 1154 BMS_SOC_STATS: 5 BMS
+    SG_ battery_mean_temp : 0|8@1+ (1,0) [10|90] "C" DUMMY_NODE_VECTOR_0
+    SG_ battery_min_temp : 8|8@1+ (1,0) [10|90] "C" DUMMY_NODE_VECTOR_0
+    SG_ battery_max_temp : 16|8@1+ (1,0) [10|90] "C" DUMMY_NODE_VECTOR_0
+    SG_ shunt_direction : 24|8@1- (1,0) [-1|1] "" DUMMY_NODE_VECTOR_0
+    SG_ soc : 32|8@1+ (1,0) [0|100] "%" DUMMY_NODE_VECTOR_0
+
+BO_ 385 LEFT_SERVO_STATUS: 8 LEFT_SERVO
+    SG_ current : 0|16@1+ (0.01,0) [0|100] "A" DUMMY_NODE_VECTOR_0
+    SG_ voltage : 16|16@1+ (0.01,0) [0|70] "V" DUMMY_NODE_VECTOR_0
+    SG_ angle : 32|16@1- (0.1,0) [-10|10] "deg" DUMMY_NODE_VECTOR_0
+    SG_ mode : 48|8@1+ (1,0) [0|2] "" DUMMY_NODE_VECTOR_0
+
+BO_ 513 RIGHT_SERVO_STATUS: 8 RIGHT_SERVO
+    SG_ current : 0|16@1+ (0.01,0) [0|100] "A" DUMMY_NODE_VECTOR_0
+    SG_ voltage : 16|16@1+ (0.01,0) [0|70] "V" DUMMY_NODE_VECTOR_0
+    SG_ angle : 32|16@1- (0.1,0) [-10|10] "deg" DUMMY_NODE_VECTOR_0
+    SG_ mode : 48|8@1+ (1,0) [0|2] "" DUMMY_NODE_VECTOR_0
+
+BO_ 641 BACK_SERVO_STATUS: 8 BACK_SERVO
+    SG_ current : 0|16@1+ (0.01,0) [0|100] "A" DUMMY_NODE_VECTOR_0
+    SG_ voltage : 16|16@1+ (0.01,0) [0|70] "V" DUMMY_NODE_VECTOR_0
+    SG_ angle : 32|16@1- (0.1,0) [-10|10] "deg" DUMMY_NODE_VECTOR_0
+    SG_ mode : 48|8@1+ (1,0) [0|2] "" DUMMY_NODE_VECTOR_0
+
+BO_ 897 MOTOR_TELEMETRY: 7 MOTOR_BOARD
+    SG_ motor_current : 0|16@1+ (0.1,0) [0|400] "A" DUMMY_NODE_VECTOR_0
+    SG_ motor_voltage : 16|16@1+ (0.01,0) [0|70] "V" DUMMY_NODE_VECTOR_0
+    SG_ setpoint_pwm : 32|16@1+ (1,0) [1000|2000] "us" DUMMY_NODE_VECTOR_0
+    SG_ motor_mode : 48|8@1+ (1,0) [0|1] "" DUMMY_NODE_VECTOR_0
+
+BO_ 898 WATER_LEVEL_SENSORS: 2 MOTOR_BOARD
+    SG_ aft_forward_section : 0|8@1+ (1,0) [0|1] "1" DUMMY_NODE_VECTOR_0
+    SG_ aft_rear_section : 8|8@1+ (1,0) [0|1] "1" DUMMY_NODE_VECTOR_0
+
+BO_ 257 GPS1_VEL_INFO: 8 INS
+   SG_ TIME_STAMP : 0|32@1+ (1,0) [0|4294970000] "µs" DUMMY_NODE_VECTOR_0
+   SG_ STATUS : 32|32@1+ (1,0) [0|4294970000] "" DUMMY_NODE_VECTOR_0
+
+BO_ 258 GPS1_VEL: 6 INS
+   SG_ VELOCITY_N : 0|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+   SG_ VELOCITY_E : 16|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+   SG_ VELOCITY_D : 32|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+
+BO_ 259 GPS1_VEL_ACC: 6 INS
+   SG_ VELOCITY_ACC_N : 0|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+   SG_ VELOCITY_ACC_E : 16|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+   SG_ VELOCITY_ACC_D : 32|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+
+BO_ 260 GPS1_VEL_COURSE: 4 INS
+   SG_ COURSE : 0|16@1+ (0.01,0) [0|655.35] "grade" DUMMY_NODE_VECTOR_0
+   SG_ COURSE_ACC : 16|16@1+ (0.01,0) [0|655.35] "grade" DUMMY_NODE_VECTOR_0
+
+BO_ 261 GPS1_POS_INFO: 8 INS
+   SG_ TIME_STAMP : 0|32@1+ (1,0) [0|4294970000] "µs" DUMMY_NODE_VECTOR_0
+   SG_ STATUS : 32|32@1+ (1,0) [0|4294970000] "" DUMMY_NODE_VECTOR_0
+
+BO_ 262 GPS1_POS: 8 INS
+   SG_ LATITUDE : 0|32@1- (1E-007,0) [-214.7483648|214.7483647] "grade" DUMMY_NODE_VECTOR_0
+   SG_ LONGITUDE : 32|32@1- (1E-007,0) [-214.7483648|214.7483647] "grade" DUMMY_NODE_VECTOR_0
+
+BO_ 263 GPS1_POS_ACC: 8 INS
+   SG_ LATITUDE_ACC : 0|16@1+ (0.01,0) [0|655.35] "m" DUMMY_NODE_VECTOR_0
+   SG_ LONGITUDE_ACC : 16|16@1+ (0.01,0) [0|655.35] "m" DUMMY_NODE_VECTOR_0
+   SG_ ALTITUDE_ACC : 32|16@1+ (0.01,0) [0|655.35] "m" DUMMY_NODE_VECTOR_0
+   SG_ BASE_STATION_ID : 48|16@1+ (1,0) [0|65535] "" DUMMY_NODE_VECTOR_0
+
+BO_ 264 UTC_1: 8 INS
+   SG_ YEAR : 0|8@1+ (1,2000) [2000|2255] "year" DUMMY_NODE_VECTOR_0
+   SG_ MONTH : 8|8@1+ (1,0) [0|255] "month" DUMMY_NODE_VECTOR_0
+   SG_ DAY : 16|8@1+ (1,0) [0|255] "d" DUMMY_NODE_VECTOR_0
+   SG_ HOUR : 24|8@1+ (1,0) [0|255] "h" DUMMY_NODE_VECTOR_0
+   SG_ MIN : 32|8@1+ (1,0) [0|255] "min" DUMMY_NODE_VECTOR_0
+   SG_ SEC : 40|8@1+ (1,0) [0|255] "s" DUMMY_NODE_VECTOR_0
+   SG_ MICRO_SEC : 48|16@1+ (100,0) [0|6553500] "us" DUMMY_NODE_VECTOR_0
+
+BO_ 265 IMU_ACCEL: 6 INS
+   SG_ ACCEL_X : 0|16@1- (0.01,0) [-327.68|327.67] "m/s^2" DUMMY_NODE_VECTOR_0
+   SG_ ACCEL_Y : 16|16@1- (0.01,0) [-327.68|327.67] "m/s^2" DUMMY_NODE_VECTOR_0
+   SG_ ACCEL_Z : 32|16@1- (0.01,0) [-327.68|327.67] "m/s^2" DUMMY_NODE_VECTOR_0
+
+BO_ 266 IMU_GYRO: 6 INS
+   SG_ GYRO_X : 0|16@1- (0.001,0) [-32.768|32.767] "rad/s" DUMMY_NODE_VECTOR_0
+   SG_ GYRO_Y : 16|16@1- (0.001,0) [-32.768|32.767] "rad/s" DUMMY_NODE_VECTOR_0
+   SG_ GYRO_Z : 32|16@1- (0.001,0) [-32.768|32.767] "rad/s" DUMMY_NODE_VECTOR_0
+
+BO_ 267 EKF_QUAT: 8 INS
+   SG_ Q0 : 0|16@1- (3.05185094759972E-005,0) [-1|1] "" DUMMY_NODE_VECTOR_0
+   SG_ Q1 : 16|16@1- (3.05185094759972E-005,0) [-1|1] "" DUMMY_NODE_VECTOR_0
+   SG_ Q2 : 32|16@1- (3.05185094759972E-005,0) [-1|1] "" DUMMY_NODE_VECTOR_0
+   SG_ Q3 : 48|16@1- (3.05185094759972E-005,0) [-1|1] "" DUMMY_NODE_VECTOR_0
+
+BO_ 270 EKF_EULER: 6 INS
+   SG_ ROLL : 0|16@1- (0.0001,0) [-3.2768|3.2767] "rad" DUMMY_NODE_VECTOR_0
+   SG_ PITCH : 16|16@1- (0.0001,0) [-3.2768|3.2767] "rad" DUMMY_NODE_VECTOR_0
+   SG_ YAW : 32|16@1- (0.0001,0) [-3.2768|3.2767] "rad" DUMMY_NODE_VECTOR_0
+
+BO_ 271 EKF_POS: 8 INS
+   SG_ LATITUDE : 0|32@1- (1E-007,0) [-214.7483648|214.7483647] "grade" DUMMY_NODE_VECTOR_0
+   SG_ LONGITUDE : 32|32@1- (1E-007,0) [-214.7483648|214.7483647] "grade" DUMMY_NODE_VECTOR_0
+
+BO_ 272 EKF_VEL_NED: 6 INS
+   SG_ VELOCITY_N : 0|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+   SG_ VELOCITY_E : 16|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+   SG_ VELOCITY_D : 32|16@1- (0.01,0) [-327.68|327.67] "m/s" DUMMY_NODE_VECTOR_0
+
+BO_ 273 SHIP_MOTION_0: 6 INS
+   SG_ SURGE : 0|16@1- (0.001,0) [-32.768|32.767] "m" DUMMY_NODE_VECTOR_0
+   SG_ SWAY : 16|16@1- (0.001,0) [-32.768|32.767] "m" DUMMY_NODE_VECTOR_0
+   SG_ HEAVE : 32|16@1- (0.001,0) [-32.768|32.767] "m" DUMMY_NODE_VECTOR_0
+
+BO_ 1282 MPPT_1_STATUS: 5 MPPT_1
+ SG_ MPPT_Enabled : 16|8@1- (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_HeatsinkTemperature : 39|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_AmbientTemperature : 31|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Fault : 8|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Mode : 0|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+
+BO_ 1281 MPPT_1_POWER: 8 MPPT_1
+ SG_ MPPT_Iout : 55|16@0- (0.0005,0) [0|0] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vout : 39|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Iin : 23|16@0- (0.0005,0) [-16.384|16.3835] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vin : 7|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+
+BO_ 1410 MPPT_2_STATUS: 5 MPPT_2
+ SG_ MPPT_Enabled : 16|8@1- (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_HeatsinkTemperature : 39|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_AmbientTemperature : 31|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Fault : 8|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Mode : 0|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+
+BO_ 1409 MPPT_2_POWER: 8 MPPT_2
+ SG_ MPPT_Iout : 55|16@0- (0.0005,0) [0|0] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vout : 39|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Iin : 23|16@0- (0.0005,0) [-16.384|16.3835] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vin : 7|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+
+BO_ 1538 MPPT_3_STATUS: 5 MPPT_3
+ SG_ MPPT_Enabled : 16|8@1- (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_HeatsinkTemperature : 39|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_AmbientTemperature : 31|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Fault : 8|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Mode : 0|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+
+BO_ 1537 MPPT_3_POWER: 8 MPPT_3
+ SG_ MPPT_Iout : 55|16@0- (0.0005,0) [0|0] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vout : 39|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Iin : 23|16@0- (0.0005,0) [-16.384|16.3835] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vin : 7|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+
+BO_ 1666 MPPT_4_STATUS: 5 MPPT_4
+ SG_ MPPT_Enabled : 16|8@1- (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_HeatsinkTemperature : 39|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_AmbientTemperature : 31|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Fault : 8|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Mode : 0|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+
+BO_ 1665 MPPT_4_POWER: 8 MPPT_4
+ SG_ MPPT_Iout : 55|16@0- (0.0005,0) [0|0] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vout : 39|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Iin : 23|16@0- (0.0005,0) [-16.384|16.3835] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vin : 7|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+
+BO_ 1794 MPPT_5_STATUS: 5 MPPT_5
+ SG_ MPPT_Enabled : 16|8@1- (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_HeatsinkTemperature : 39|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_AmbientTemperature : 31|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Fault : 8|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Mode : 0|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+
+BO_ 1793 MPPT_5_POWER: 8 MPPT_5
+ SG_ MPPT_Iout : 55|16@0- (0.0005,0) [0|0] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vout : 39|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Iin : 23|16@0- (0.0005,0) [-16.384|16.3835] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vin : 7|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+
+BO_ 1922 MPPT_6_STATUS: 5 MPPT_6
+ SG_ MPPT_Enabled : 16|8@1- (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_HeatsinkTemperature : 39|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_AmbientTemperature : 31|8@0- (1,0) [-128|127] "C" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Fault : 8|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Mode : 0|8@1+ (1,0) [0|0] "" DUMMY_NODE_VECTOR_0
+
+BO_ 1921 MPPT_6_POWER: 8 MPPT_6
+ SG_ MPPT_Iout : 55|16@0- (0.0005,0) [0|0] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vout : 39|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Iin : 23|16@0- (0.0005,0) [-16.384|16.3835] "A" DUMMY_NODE_VECTOR_0
+ SG_ MPPT_Vin : 7|16@0- (0.01,0) [-327.68|327.67] "V" DUMMY_NODE_VECTOR_0
+
+VAL_ 130 bilge_pump_cmd 0 "OFF" 1 "LOW" 2 "HIGH" 3 "AUTO" ;
+VAL_ 130 cooling_pump_cmd 0 "OFF" 1 "LOW" 2 "HIGH" 3 "AUTO" ;
+VAL_ 130 flight_control_cmd 0 "OFF" 1 "LOW" 2 "HIGH" 3 "AUTO" ;
+VAL_ 897 motor_mode 0 "MANUAL" 1 "AUTO" ;
+VAL_ 385 mode 0 "DISABLED" 1 "HOMING" 2 "ENABLED" ;
+VAL_ 513 mode 0 "DISABLED" 1 "HOMING" 2 "ENABLED" ;
+VAL_ 641 mode 0 "DISABLED" 1 "HOMING" 2 "ENABLED" ;
+VAL_TABLE_ MPPT_Enabled 1 "Enabled" 0 "Disabled" ;
+VAL_TABLE_ MPPT_Mode 6 "Fault" 5 "Temperature De-rating" 4 "Constant Output Current" 3 "Constand Output Voltage" 2 "Minimum Input Current" 1 "Constand Input Current" 0 "Constand Input Voltage" ;
+VAL_TABLE_ MPPT_Fault 8 "Fault" 7 "Phase Over Current" 6 "Input Under Current" 5 "Input Over Current" 4 "Output Over Current" 3 "Output Over Voltage" 2 "Input Over Voltage" 1 "Configuration Error" 0 "OK(No Fault)" ;
+
+CM_ "
+Message ID:
+    [board ID][   msg ID   ]
+    [   4b   ][     7b     ]
+
+Node IDs:
+
+    4 most dominant bits (highest prio)
+    ====================
+    <source board> | <board ID>[bin] | <board ID>[dec] | <starting frame ID>[dec]
+    RPI_TB         | 0000            | 0               | 0
+    STEERING_WHEEL | 0001            | 1               | 128
+    INS            | 0010            | 2               | 256
+    LEFT_SERVO     | 0011            | 3               | 384
+    RIGHT_SERVO    | 0100            | 4               | 512
+    BACK_SERVO     | 0101            | 5               | 640
+    HEIGHT_SENSOR  | 0110            | 6               | 768
+    MOTOR          | 0111            | 7               | 896
+    ESC            | 1000            | 8               | 1024
+    BMS            | 1001            | 9               | 1152
+    MPPT 1         | 1010            | 10              | 1280
+    MPPT 2         | 1011            | 11              | 1408
+    MPPT 3         | 1100            | 12              | 1536
+    MPPT 4         | 1101            | 13              | 1664
+    MPPT 5         | 1110            | 14              | 1792
+    MPPT 6         | 1111            | 15              | 1920
+
+================== ESC FRAMES NOTE =============================
+
+Message ID calculation:
+    Board ID 7 (MOTOR/ESC) uses binary 0111 in the 4 MSB of an 11-bit ID.
+    Base Address = 0x380 (896 decimal) [cite: 72-73].
+
+ESC Details (HBCi3 Protocol V15):
+    Telemetry Packets 1-7 integrated [cite: 36-53].
+    Baudrate: 125 kbps.
+    Source Node: ESC.
+================== REFACTOR NOTES ==============================
+
+125 kbps = 125000 bps
+
+SOF + ID + RTR + IDE + RB + DLC + DATA + CRC + CRCD + ACKS + ACKD + EOF + IFS
+1 + 11 + 1 + 1 + 1 + 4 + 64 + 15 + 1 + 1 + 1 + 7 + 3 = 111
+125000 / 111 = 1126 fps ~= 1000 fps (duzio)
+dla 9 płytek górna granica 100 ramek / sekunde / płytke (100 Hz = 10 frames/milisecond)";

@@ -1,0 +1,12 @@
+../Middlewares/Libs/tmc/TMC5160.h:87:24:tmc5160_fieldUpdate	1
+../Middlewares/Libs/tmc/TMC5160.h:92:20:tmc5160_fieldWrite	1
+../Middlewares/Libs/tmc/TMC5160.c:54:6:tmc5160_setDirtyBit	2
+../Middlewares/Libs/tmc/TMC5160.c:65:6:tmc5160_getDirtyBit	2
+../Middlewares/Libs/tmc/TMC5160.c:79:6:tmc5160_cache	8
+../Middlewares/Libs/tmc/TMC5160.c:116:6:tmc5160_initCache	8
+../Middlewares/Libs/tmc/TMC5160.c:163:9:tmc5160_readRegister	3
+../Middlewares/Libs/tmc/TMC5160.c:181:6:tmc5160_writeRegister	2
+../Middlewares/Libs/tmc/TMC5160.c:191:13:writeRegisterSPI	1
+../Middlewares/Libs/tmc/TMC5160.c:207:16:readRegisterSPI	1
+../Middlewares/Libs/tmc/TMC5160.c:222:6:tmc5160_rotateMotor	3
+../Middlewares/Libs/tmc/TMC5160.c:231:16:CRC8	2

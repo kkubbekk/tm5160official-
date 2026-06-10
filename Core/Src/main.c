@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "TMC_api.h"
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -46,6 +47,8 @@
 ADC_HandleTypeDef hadc1;
 
 SPI_HandleTypeDef hspi1;
+DMA_HandleTypeDef hdma_spi1_rx;
+DMA_HandleTypeDef hdma_spi1_tx;
 
 UART_HandleTypeDef huart1;
 
@@ -53,16 +56,19 @@ UART_HandleTypeDef huart1;
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 128 * 4,
+  .stack_size = 524 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
+osSemaphoreId_t spiDmaSemaphoreHandle;
+const osSemaphoreAttr_t spiDmaSemaphore_attributes = { .name = "spiDmaSem" };
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
@@ -111,6 +117,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
@@ -127,6 +134,9 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
+
+  spiDmaSemaphoreHandle = osSemaphoreNew(1, 0, &spiDmaSemaphore_attributes);
+
 //  static SemaphoreHandle_t dma_semaphore;
   /* USER CODE END RTOS_SEMAPHORES */
 
@@ -336,6 +346,25 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+  /* DMA2_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -411,6 +440,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -423,67 +453,104 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-	// 1. Zmienne potrzebne do pomiaru zasilania
-	uint32_t adc_raw = 0;
-	float real_voltage = 12.0f;
+    uint32_t adc_raw = 0;
+    float real_voltage = 12.0f;
 
-	// 2. WSTĘPNE BLOKADY SPRZĘTOWE
-	// Wyłączamy wszystko na starcie, żeby układ nie "zgłupiał" przy skokach napięcia
-	HAL_GPIO_WritePin(SD_MODE_GPIO_Port, SD_MODE_Pin, GPIO_PIN_RESET); //sdome
-	HAL_GPIO_WritePin(GPIOB, PWR_CONVERTER_EN_Pin, GPIO_PIN_RESET); // Przetwornica OFF
-	HAL_GPIO_WritePin(GPIOA, MOTOR_EN_Pin, GPIO_PIN_SET);           // Silnik OFF (Stan wysoki = odcięcie)
-	HAL_GPIO_WritePin(GPIOA, TMC_CS_Pin, GPIO_PIN_SET);             // SPI CS w górę (stan spoczynkowy)
-	HAL_GPIO_WritePin(GPIOB, SPI_EN_Pin, GPIO_PIN_SET);             // Zezwolenie na komunikację SPI
-//	HAL_GPIO_WritePin(GPIOC, SD_MODE_REAL_Pin, GPIO_PIN_RESET);     // Wymuszenie trybu SPI (zamiast Step/Dir)
+    // --- 1. TWARDY RESET SPRZĘTOWY (1:1 z kodem kolegi) ---
+    HAL_GPIO_WritePin(GPIOB, PWR_CONVERTER_EN_Pin, GPIO_PIN_RESET); // wylaczenie przetwornicy
+    HAL_GPIO_WritePin(SD_MODE_GPIO_Port, SD_MODE_Pin, GPIO_PIN_RESET); // SD_MODE na 0 zeby uklad sluchal SPI
+    HAL_GPIO_WritePin(GPIOA, MOTOR_EN_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOA, TMC_CS_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOB, SPI_EN_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, DIR_Pin, GPIO_PIN_RESET);
 
-//	 3. WERYFIKACJA ZASILANIA (Pętla z ADC)
-	printf("[LOGIC] Oczekiwanie na 800mV\r\n");
-	while(real_voltage > 0.8f)
-	{
-	    HAL_ADC_Start(&hadc1);
-	    if(HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
-	    {
-	        adc_raw = HAL_ADC_GetValue(&hadc1);
-	        real_voltage = (((float)adc_raw * 3.3f) / 4095.0f) * 4.03f;
-	        printf("[LOGIC] V: %.2f\r\n", real_voltage);
-	    }
-	    osDelay(100); // RTOS oddaje czas procesora
-	}
+    printf("[LOGIC] oczekiwanie az spadnie ponizej 800mV\r\n");
 
-	// 4. BEZPIECZNY ROZRUCH
-	printf("[LOGIC] Napiecie OK/Przetwornica ON, silnik ENABLE\r\n");
-	HAL_GPIO_WritePin(GPIOB, PWR_CONVERTER_EN_Pin, GPIO_PIN_SET); // Włączamy główne zasilanie
-	osDelay(2000);                                                // 2 sekundy, żeby kondensatory się naładowały
-	HAL_GPIO_WritePin(GPIOA, MOTOR_EN_Pin, GPIO_PIN_RESET);       // Włączamy cewki (Stan niski = włączony)
-	osDelay(500);                                                 // Czekamy aż prąd się ustabilizuje
+    while(real_voltage > 0.8f)
+    {
+        HAL_ADC_Start(&hadc1);
+        if(HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
+        {
+            adc_raw = HAL_ADC_GetValue(&hadc1);
+            real_voltage = (((float)adc_raw * 3.3f) / 4095.0f) * 4.03f;
+            printf("[LOGIC] V: %.2f\r\n", real_voltage);
+        }
+        osDelay(10);
+    }
 
-	// 5. INICJALIZACJA TMC-API (Oprogramowanie)
-	printf("[LOGIC] Konfiguracja sterownika po SPI\r\n");
-	tmc5160_initCache();
+    printf("[LOGIC] napiecie zeszlo. Wlaczam zasilanie\r\n");
+    HAL_GPIO_WritePin(GPIOB, PWR_CONVERTER_EN_Pin, GPIO_PIN_SET);
+    osDelay(2000);
+    HAL_GPIO_WritePin(GPIOA, MOTOR_EN_Pin, GPIO_PIN_RESET);
+    osDelay(500);
 
-	// Konfiguracja rejestru CHOPCONF (Musimy podać kompletne, bezpieczne wartości!)
-	tmc5160_fieldWrite(0, TMC5160_TOFF_FIELD, 3);     // Czas wyłączenia kluczy (odblokowanie chopperów)
-	tmc5160_fieldWrite(0, TMC5160_TBL_FIELD, 2);      // TBL = 2 (Czas ślepy ~24 cykle zegara) -> TO RATUJE PRZED BŁĘDEM ZWARCIA!
-	tmc5160_fieldWrite(0, TMC5160_HEND_FIELD, 0);     // Hysteresis end
-	tmc5160_fieldWrite(0, TMC5160_HSTRT_FIELD, 5);    // Hysteresis start
 
-	// Ustawienie prądów
-	tmc5160_fieldWrite(0, TMC5160_IRUN_FIELD, 15);    // Prąd w ruchu
-	tmc5160_fieldWrite(0, TMC5160_IHOLD_FIELD, 5);    // Prąd trzymania
-	tmc5160_fieldWrite(0, TMC5160_IHOLDDELAY_FIELD, 10); // Opóźnienie przejścia w IHOLD
+    printf("[DIAG] Checking motor configuration...\r\n");
 
-	// KONFIGURACJA RAMPY (Bez tego wewnętrzny generator stoi w miejscu!)
-	tmc5160_fieldWrite(0, TMC5160_AMAX_FIELD, 5000);  // Ustawiamy przyspieszenie
-	tmc5160_fieldWrite(0, TMC5160_DMAX_FIELD, 5000);  // Ustawiamy opóźnienie hamowania
+        // Czytaj XTARGET - sprawdź czy się zapisało
+        uint32_t xtarget_readback = tmc5160_readRegister(0, TMC5160_XTARGET);
+        printf("[DIAG] XTARGET readback = %ld\r\n", (int32_t)xtarget_readback);
 
-	// Testowy obrót
-	printf("[LOGIC] Start krecenia silnikiem...\r\n");
-	tmc5160_rotateMotor(0, 0, 50000);
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+        // Czytaj DRV_STATUS - czy error?
+        uint32_t drv_status = tmc5160_readRegister(0, TMC5160_DRV_STATUS);
+        printf("[DIAG] DRV_STATUS = 0x%08lX\r\n", drv_status);
+
+        // Sprawdź IHOLD_IRUN
+        uint32_t ihold = tmc5160_readRegister(0, TMC5160_IHOLD_IRUN);
+        printf("[DIAG] IHOLD_IRUN = 0x%08lX\r\n", ihold);
+
+        // Sprawdź czy MOTOR_EN jest aktywny
+        printf("[DIAG] MOTOR_EN pin = %d\r\n",
+               HAL_GPIO_ReadPin(GPIOA, MOTOR_EN_Pin));
+
+        osDelay(1000);
+
+    printf("[TEST_SPI] === Koniec testu SPI ===\r\n\r\n");
+
+
+
+        // Inicjalizacja API Silnika
+        Stepper_ConfigTypeDef hydrofoil1_config;
+        hydrofoil1_config.run_current     = 31;
+        hydrofoil1_config.hold_current    = 5;
+        hydrofoil1_config.max_velocity    = 1000000;
+        hydrofoil1_config.acceleration    = 15000;
+        hydrofoil1_config.decceleration   = 15000;
+        hydrofoil1_config.enable_coolstep = false;
+        hydrofoil1_config.microsteps      = 256;
+
+        stepper_init(&hydrofoil1_config);
+
+        printf("[API] Silnik skonfigurowany pomyslnie!\r\n");
+
+
+    volatile int32_t target_position = 0;
+
+    int step = 0;
+
+
+
+    while(1)
+    {
+        // tu bedzie nadpisywac CAN z joysticka, narazie symulacja ruchow
+        step++;
+        if(step == 1) target_position = 200000;
+        if(step == 2) target_position = -200000;
+        if(step > 2) step = 0;
+
+        // blyskawiczna aktualizacja rejestru bez czekania
+        if(Stepper_isPositionReached()) {
+            printf("[RUNNING] Jazda na: %ld\r\n", target_position);
+//            tmc5160_writeRegister(0, TMC5160_XTARGET, target_position);
+            stepper_SetTargetPosition(target_position);
+//            current_target = target_position;
+            int32_t gowno = Stepper_GetActualPosition();
+            printf("acutal pos %ld: ",gowno);
+        }
+
+        // na testy zeby bylo widac ze jedzie (potem wywalic ten delay)
+
+    }
   /* USER CODE END 5 */
 }
 

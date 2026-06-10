@@ -53,7 +53,7 @@ typedef struct
 
 // => TMC-API wrapper
 extern void tmc5160_readWriteSPI(uint16_t icID, uint8_t *data, size_t dataLength);
-extern bool tmc5160_readWriteUART(uint16_t icID, uint8_t *data, size_t writeLength, size_t readLength);
+//extern bool tmc5160_readWriteUART(uint16_t icID, uint8_t *data, size_t writeLength, size_t readLength);
 extern TMC5160BusType tmc5160_getBusType(uint16_t icID);
 extern uint8_t tmc5160_getNodeAddress(uint16_t icID);
 // => TMC-API wrapper
